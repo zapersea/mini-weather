@@ -41,6 +41,8 @@ public class MainActivity  extends Activity implements View.OnClickListener{
             temperatureTv, climateTv, windTv, city_name_Tv;
     private ImageView weatherImg, pmImg;
 
+    private String currentCityCode="101010100";
+
     private Handler mHandler = new Handler() {
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
@@ -61,6 +63,7 @@ public class MainActivity  extends Activity implements View.OnClickListener{
         mUpdateBtn=(ImageView)findViewById(R.id.title_update_btn);
         mUpdateBtn.setOnClickListener(this);
         initView();
+        queryWeatherCode(currentCityCode);
 
     }
 
@@ -74,7 +77,7 @@ public class MainActivity  extends Activity implements View.OnClickListener{
 
         if (v.getId()==R.id.title_update_btn){
             SharedPreferences sharedPreferences=getSharedPreferences("config",MODE_PRIVATE);
-            String cityCode=sharedPreferences.getString("main_city_code","101010100");
+            String cityCode=sharedPreferences.getString("main_city_code",currentCityCode);
             Log.d("myWeather",cityCode);
             queryWeatherCode(cityCode);
             if (NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
@@ -95,6 +98,7 @@ public class MainActivity  extends Activity implements View.OnClickListener{
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1 && resultCode == RESULT_OK) {
             String newCityCode= data.getStringExtra("cityCode");
+            currentCityCode=newCityCode;
             Log.d("myWeather", "选择的城市代码为"+newCityCode);
             if (NetUtil.getNetworkState(this) != NetUtil.NETWORN_NONE) {
                 Log.d("myWeather", "网络OK");
@@ -120,16 +124,16 @@ public class MainActivity  extends Activity implements View.OnClickListener{
         windTv = (TextView) findViewById(R.id.wind);
         weatherImg = (ImageView) findViewById(R.id.weather_img);
 
-        city_name_Tv.setText("N/A");
-        cityTv.setText("N/A");
-        timeTv.setText("N/A");
-        humidityTv.setText("N/A");
-        pmDataTv.setText("N/A");
-        pmQualityTv.setText("N/A");
-        weekTv.setText("N/A");
-        temperatureTv.setText("N/A");
-        climateTv.setText("N/A");
-        windTv.setText("N/A");
+//        city_name_Tv.setText("N/A");
+//        cityTv.setText("N/A");
+//        timeTv.setText("N/A");
+//        humidityTv.setText("N/A");
+//        pmDataTv.setText("N/A");
+//        pmQualityTv.setText("N/A");
+//        weekTv.setText("N/A");
+//        temperatureTv.setText("N/A");
+//        climateTv.setText("N/A");
+//        windTv.setText("N/A");
     }
 
     private void queryWeatherCode(String cityCode) {
