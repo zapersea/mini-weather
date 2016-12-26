@@ -9,15 +9,21 @@ public class City {
     private String number;
     private String firstPY;
     private String allPY;
-    private String allFristPY;
+    private String allFirstPY;
 
-    public City(String province, String city, String number, String firstPY, String allPY, String allFristPY) {
+    @Override
+    public String toString() {
+        return province + " - " + city + " " + allPY;
+    }
+
+    public City(String province, String city, String number, String
+            firstPY, String allPY, String allFirstPY) {
         this.province = province;
         this.city = city;
         this.number = number;
         this.firstPY = firstPY;
         this.allPY = allPY;
-        this.allFristPY = allFristPY;
+        this.allFirstPY = allFirstPY;
     }
 
     public String getProvince() {
@@ -60,12 +66,12 @@ public class City {
         this.allPY = allPY;
     }
 
-    public String getAllFristPY() {
-        return allFristPY;
+    public String getallFirstPY() {
+        return allFirstPY;
     }
 
-    public void setAllFristPY(String allFristPY) {
-        this.allFristPY = allFristPY;
+    public void setallFirstPY(String allFirstPY) {
+        this.allFirstPY = allFirstPY;
     }
-
 }
+

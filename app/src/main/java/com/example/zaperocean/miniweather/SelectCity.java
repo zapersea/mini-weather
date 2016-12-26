@@ -3,74 +3,112 @@ package com.example.zaperocean.miniweather;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.zaperocean.miniweather.app.MyApplication;
 import com.example.zaperocean.miniweather.bean.City;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Created by Zaper Ocean on 2016/10/18.
  */
-public class SelectCity extends Activity implements View.OnClickListener{
-
-    private ListView myListView;
+public class SelectCity extends Activity implements View.OnClickListener {
     private ImageView mBackBtn;
+    private TextView cityNameTv;
+    private EditText mEditText;
+
+    private ListView mListView;
     private List<City> mCityList;
-    private String chooseCityCode;
+    private ArrayAdapter<City> mAdapter;
+
+    private AdapterView.OnItemClickListener mMessageClickedHandler =
+            new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView parent, View v, int position, long id) {
+                    String cityCode = ((City) parent.getItemAtPosition(position)).getNumber();
+
+                    Intent i = new Intent();
+                    i.putExtra("cityCode", cityCode);
+                    setResult(RESULT_OK, i);
+                    finish();
+                }
+            };
+
+    TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            String cs = mEditText.getText().toString().toUpperCase();
+            mAdapter.getFilter().filter(cs);
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+        }
+    };
+
+    OnScrollListener scrollListener = new OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+            if (scrollState != 0) {
+                InputMethodManager imm = (InputMethodManager)
+                        getSystemService(Activity.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+            }
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.select_city);
+        cityNameTv = (TextView) findViewById(R.id.title_name);
+        cityNameTv.setText("当前城市：" + this.getIntent().getStringExtra("cityName"));
 
-        MyApplication app=MyApplication.getInstance();
-        mCityList=app.getCityList();
-        myListView=(ListView)findViewById(R.id.list_view);
-        myListView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,getData(mCityList)));
-        myListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        MyApplication myApplication = (MyApplication) getApplication();
+        mCityList = myApplication.getmCityList();
 
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-                                    long arg3) {
-                setTitle("点击第" + arg2 + "个项目");
-                chooseCityCode=mCityList.get(arg2).getNumber();
-                Intent i = new Intent();
-                i.putExtra("cityCode", chooseCityCode);
-                setResult(RESULT_OK, i);
-                finish();
-            }
-        });
+        mListView = (ListView) findViewById(R.id.city_list);
+        mAdapter = new ArrayAdapter<>(this, R.layout.list_item, mCityList);
+        mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(mMessageClickedHandler);
+        mListView.setOnScrollListener(scrollListener);
+
         mBackBtn = (ImageView) findViewById(R.id.title_back);
         mBackBtn.setOnClickListener(this);
+
+        mEditText = (EditText) findViewById(R.id.search_edit);
+        mEditText.addTextChangedListener(mTextWatcher);
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()){
+    public void onClick(View view) {
+        switch (view.getId()) {
             case R.id.title_back:
-                Intent i = new Intent();
-                i.putExtra("cityCode", "101160101");
-                setResult(RESULT_OK, i);
                 finish();
                 break;
             default:
                 break;
         }
-    }
-
-    private List<String> getData(List<City> mCityList){
-        ArrayList<String> re=new ArrayList<>();
-        for(City city:mCityList){
-            re.add(city.getCity());
-        }
-        return re;
     }
 }
